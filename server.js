@@ -30,6 +30,7 @@ mongoose.connect("mongodb://localhost/commentsjobdb", { useNewUrlParser: true })
 
 // A GET route for scraping the indeed website
 app.get("/scrape", function(req, res) {
+  var count = 0;
   // First, we grab the body of the html with axios
   axios.get("https://www.indeed.com/jobs?q=software+engineer&l=Seattle%2C+WA").then(function(response) {
     // Then, we load that into cheerio and save it to $ for a shorthand selector
@@ -39,6 +40,7 @@ app.get("/scrape", function(req, res) {
     $("div.jobsearch-SerpJobCard").each(function(i, element) {
       // Save an empty result object
       var result = {};
+
       // console.log(element);
       // Add the text and href of every link, and save them as properties of the result object
       result.title = $(element)
@@ -58,20 +60,26 @@ app.get("/scrape", function(req, res) {
         .children("a")
         .attr("href");
 
+      db.Job.find({ title: result.title, companyName: result.companyName, body: result.body }, function(err, jobs) {
+        if (jobs.length == 0) {
+          db.Job.create(result)
+            .then(function(dbJob) {
+              // View the added result in the console
+              console.log(dbJob);
+              count++;
+              console.log(count);
+            })
+            .catch(function(err) {
+              // If an error occurred, log it
+              console.log(err);
+            });
+        }
+      });
       // Create a new Job using the `result` object built from scraping
-      db.Job.create(result)
-        .then(function(dbJob) {
-          // View the added result in the console
-          console.log(dbJob);
-        })
-        .catch(function(err) {
-          // If an error occurred, log it
-          console.log(err);
-        });
     });
 
     // Send a message to the client
-    res.send("Scrape Complete");
+    res.send("Scrape Complete! ");
   });
 });
 
