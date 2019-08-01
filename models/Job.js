@@ -8,6 +8,7 @@ var Schema = mongoose.Schema;
 var JobSchema = new Schema({
   // `title` must be of type String
   title: String,
+  companyName: String,
   // `body` must be of type String
   body: String,
   // `link` must be of type String

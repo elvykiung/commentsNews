@@ -36,15 +36,25 @@ app.get("/scrape", function(req, res) {
     var $ = cheerio.load(response.data);
 
     // Now, we grab every h2 within an article tag, and do the following:
-    $("div.title").each(function(i, element) {
+    $("div.jobsearch-SerpJobCard").each(function(i, element) {
       // Save an empty result object
       var result = {};
-
+      // console.log(element);
       // Add the text and href of every link, and save them as properties of the result object
-      result.title = $(this)
-        .children("title")
-        .text();
-      result.link = $(this)
+      result.title = $(element)
+        .children("div.title")
+        .children("a")
+        .attr("title");
+      result.companyName = $(element)
+        .find("span.company")
+        .text()
+        .trim();
+      result.body = $(element)
+        .find("div.summary")
+        .text()
+        .trim();
+      result.link = $(element)
+        .find("div.title")
         .children("a")
         .attr("href");
 
