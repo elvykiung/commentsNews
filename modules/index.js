@@ -2,5 +2,5 @@
 
 module.exports = {
   Comment: require("./Comment"),
-  User: require("./User")
+  Job: require("./Job")
 };
